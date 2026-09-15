@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://traktor.academy/schemas/sources.schema.json",
+  "title": "Traktor Academy Source Record",
+  "description": "A captured piece of evidence about Native Instruments Traktor or Traktor-compatible hardware. One record per source, stored at research/sources/src-####.json. A source record exists to make a claim re-checkable by someone who was not present when it was captured.",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "publisher",
+    "tier",
+    "url",
+    "captured_at",
+    "published_at",
+    "raw_ref",
+    "version_context",
+    "applies_to",
+    "status"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^src-[0-9]{4,}$",
+      "description": "Stable identifier. Never reused, including for withdrawn sources."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Title exactly as the source presents it. Do not paraphrase."
+    },
+    "publisher": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Who published it. For community sources, the identifiable author or platform."
+    },
+    "tier": {
+      "type": "string",
+      "enum": ["T0", "T1", "T2", "T3", "T4"],
+      "description": "Evidence tier assigned at capture time. T0 = official NI documentation (highest authority). T1 = official NI-adjacent. T2 = third-party hardware manufacturer documentation. T3 = reputable attributable community. T4 = forums and anecdotes. Tier is a property of the source, not of the claim."
+    },
+    "url": {
+      "type": "string",
+      "pattern": "^(https?://|file://|urn:local:).+",
+      "description": "Exact URL as retrieved. Not a canonicalised or cleaned-up form. Local captures use urn:local:."
+    },
+    "captured_at": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "description": "ISO date the source was retrieved. Mandatory: web sources change silently and an undated citation cannot be re-checked."
+    },
+    "published_at": {
+      "type": "string",
+      "pattern": "^([0-9]{4}-[0-9]{2}-[0-9]{2}|unknown)$",
+      "description": "ISO publication date, or the literal string 'unknown' where the source does not state one. Never guessed."
+    },
+    "raw_ref": {
+      "type": "string",
+      "pattern": "^raw-[0-9]{4}-[0-9]{2}-[0-9]{2}-.+$",
+      "description": "Directory under research/raw/ holding the immutable capture. Every source record must point at a real capture."
+    },
+    "version_context": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Which Traktor version(s) the source addresses, or 'unknown' where it does not say. A source that is correct for one version only is a common failure mode."
+    },
+    "applies_to": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Products, versions or hardware the source covers. ['unknown'] is a valid and honest value; an invented list is not."
+    },
+    "confidence_notes": {
+      "type": "string",
+      "description": "Anything weakening this source: marketing rather than documentation, undated, vendor describing Traktor software, apparent translation, superseded edition."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "link_broken", "superseded", "withdrawn"],
+      "description": "active = usable. link_broken = URL no longer resolves; the record is kept because claims still cite it. superseded = replaced by a newer source, which is named in confidence_notes. withdrawn = determined invalid; never deleted, so the audit trail survives."
+    },
+    "superseded_by": {
+      "type": ["string", "null"],
+      "description": "Id of the replacing source (src-####) when status is superseded, otherwise null."
+    },
+    "retrieved_by": {
+      "type": "string",
+      "description": "Role or agent that performed the capture."
+    }
+  }
+}
